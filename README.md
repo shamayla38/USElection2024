@@ -2,7 +2,7 @@
 
 ## Overview
 
-The repository provides forecasts for the 2024 U.S. elections using a "polls of polls" method, which aggregates data from multiple polling sources to generate more accurate predictions. By combining and analyzing these polls, the forecast offers a clearer picture of electoral trends and potential outcomes.
+The repository provides forecasts for the 2024 U.S. elections using a "polls of polls" method, which aggregates data from multiple polling sources to generate more accurate predictions. By combining and analyzing these polls, the forecast offers a clearer picture of electoral trends and potential outcomes. The project was done in an entirely reproducable way and can be recreated fully using this repository.
 
 The raw data was downloaded from the website FiveThirtyEight at the following link: https://projects.fivethirtyeight.com/polls/president-general/2024/national/ 
 
