@@ -1,0 +1,5 @@
+How do I simulate a random number (numeric grade) between 1.0 and 10.0 up to 10 decimal places, for a 100 times?
+
+ChatGPT:
+
+numeric_grade <- round(runif(n, min = 1.0, max = 10.0), 2)

@@ -1,0 +1,174 @@
+user:
+
+the numeric variables are: numeric_grade, pollscore, sample size, and num_support. 
+
+this is what the textbook told us about summary stats:
+
+5.3.3 Communicating summary statistics
+After installing and loading modelsummary we can use datasummary_skim() to create tables of summary statistics from our dataset.
+
+We can use this to get a table such as Table 5.6. That might be useful for exploratory data analysis, which we cover in Chapter 11. (Here we remove population to save space and do not include a histogram of each variable.)
+
+world_bank_data |>
+  select(-population) |> 
+  datasummary_skim(histogram = FALSE)
+
+Table 5.6: Summary of economic indicator variables for four countries
+Unique	Missing Pct.	Mean	SD	Min	Median	Max
+year	62	0	1990.5	17.9	1960.0	1990.5	2021.0
+inflation	243	2	6.1	6.5	-9.8	4.3	44.4
+gdp_growth	224	10	4.2	3.7	-11.1	3.9	13.9
+country	N	%					
+Australia	62	25.0					
+Ethiopia	62	25.0					
+India	62	25.0					
+United States	62	25.0					
+By default, datasummary_skim() summarizes the numeric variables, but we can ask for the categorical variables (Table 5.7). Additionally we can add cross-references in the same way as kable(), that is, include a “tbl-cap” entry and then cross-reference the name of the R chunk.
+
+world_bank_data |>
+  datasummary_skim(type = "categorical")
+
+Table 5.7: Summary of categorical economic indicator variables for four countries
+country	N	%
+Australia	62	25.0
+Ethiopia	62	25.0
+India	62	25.0
+United States	62	25.0
+We can create a table that shows the correlation between variables using datasummary_correlation() (Table 5.8).
+
+world_bank_data |>
+  datasummary_correlation()
+
+Table 5.8: Correlation between the economic indicator variables for four countries (Australia, Ethiopia, India, and the United States)
+year	inflation	gdp_growth	population
+year	1	.	.	.
+inflation	.03	1	.	.
+gdp_growth	.11	.01	1	.
+population	.25	.06	.16	1
+We typically need a table of descriptive statistics that we could add to our paper (Table 5.9). This contrasts with Table 5.7 which would likely not be included in the main section of a paper, and is more to help us understand the data. We can add a note about the source of the data using notes.
+
+datasummary_balance(
+  formula = ~country,
+  data = world_bank_data |> 
+    filter(country %in% c("Australia", "Ethiopia")),
+  dinm = FALSE,
+  notes = "Data source: World Bank."
+)
+
+Table 5.9: Descriptive statistics for the inflation and GDP dataset
+Australia (N=62)	Ethiopia (N=62)
+Mean	Std. Dev.	Mean	Std. Dev.
+Data source: World Bank.
+year	1990.5	18.0	1990.5	18.0
+inflation	4.7	3.8	9.1	10.6
+gdp_growth	3.4	1.8	5.9	6.4
+population	17351313.1	4407899.0	57185292.0	29328845.8
+
+so i want to make a summary statistics table for these four variables. help
+
+ChatGPT:
+
+To create a summary statistics table for the numerical variables (`numeric_grade`, `pollscore`, `sample_size`, and `num_support`) using the `modelsummary` package in R, you can follow these steps. I will guide you through the process of generating the table and provide the necessary code.
+
+### Step-by-Step Guide
+
+1. **Install and load necessary packages** (if you haven’t already):
+   Make sure you have the `modelsummary` package installed. You can do this by running:
+
+   ```r
+   install.packages("modelsummary")
+   ```
+
+2. **Load the libraries**:
+   Load the required libraries for your analysis.
+
+   ```r
+   library(dplyr)
+   library(modelsummary)
+   ```
+
+3. **Creating the summary statistics table**:
+   Use the `datasummary_skim()` function to summarize the selected numerical variables.
+
+### Example Code
+
+Here’s how you can create the summary statistics table:
+
+```r
+# Assuming analysis_data is your dataframe containing the necessary variables
+
+# Load the required libraries
+library(dplyr)
+library(modelsummary)
+
+# Create the summary statistics table for the specified numerical variables
+summary_table <- analysis_data %>%
+  select(numeric_grade, pollscore, sample_size, num_support) %>%
+  datasummary_skim(histogram = FALSE)
+
+# Display the summary statistics table
+print(summary_table)
+```
+
+### Explanation of the Code:
+
+- **`select(numeric_grade, pollscore, sample_size, num_support)`**: This selects the specified numerical variables from your dataset.
+- **`datasummary_skim(histogram = FALSE)`**: This function summarizes the selected variables and returns a table that includes statistics such as mean, standard deviation, min, median, and max. The `histogram = FALSE` argument is used to omit histogram plots in the output.
+
+### Additional Formatting
+
+If you want to customize the table further (like adding captions or notes), you can do that by using options in `datasummary_skim()` or by modifying the output table afterward.
+
+### Output
+
+This will generate a table similar to the one you provided in your textbook, summarizing the four numerical variables with relevant statistics. If you need any specific formatting or additional statistics, let me know!
+
+
+User: im getting this error after i added some things to the code you made: no applicable method for 'rename_with' applied to an object of class "c('kableExtra', 'knitr_kable')"
+
+ChatGPT: 
+
+The error you're seeing indicates that the output of `datasummary_skim()` is being treated as a `kableExtra` object, which does not support the `rename_with()` function directly. Since `datasummary_skim()` creates a table that has already been formatted, we need to handle the renaming and formatting differently.
+
+### Solution
+Instead of using `rename_with()`, we can modify the column names after the table is created by converting the summary statistics table to a data frame first, then performing the renaming. Here’s how you can do it:
+
+### Adjusted Code
+```r
+# Load the required libraries
+library(dplyr)
+library(modelsummary)
+
+# Set options to use tinytable for table formatting
+options(modelsummary_factory_default = 'tinytable')
+
+# Create the summary statistics table for the specified numerical variables
+summary_table <- analysis_data %>%
+  select(numeric_grade, pollscore, sample_size, num_support) %>%
+  datasummary_skim(
+    fun_numeric = list(
+      mean = mean,
+      sd = sd,
+      min = min,
+      median = median,
+      max = max
+    )
+  )
+
+# Convert the summary_table to a data frame for renaming
+summary_table_df <- as.data.frame(summary_table)
+
+# Remove underscores and capitalize column names
+colnames(summary_table_df) <- gsub("_", " ", colnames(summary_table_df))  # Remove underscores
+colnames(summary_table_df) <- toupper(colnames(summary_table_df))          # Capitalize column names
+
+# Display the summary statistics table
+print(summary_table_df)
+```
+
+### Key Changes:
+1. **Convert to Data Frame**: The line `summary_table_df <- as.data.frame(summary_table)` converts the summary statistics table to a data frame. This allows us to manipulate the column names easily.
+2. **Column Renaming**: We then use `gsub()` to replace underscores with spaces and `toupper()` to capitalize the column names directly on `colnames(summary_table_df)`.
+
+### Final Output
+This code should correctly generate your summary statistics table with the desired formatting changes without any errors. Let me know if this works for you or if you have any more questions!
